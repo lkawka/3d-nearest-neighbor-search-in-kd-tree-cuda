@@ -51,7 +51,7 @@ void buildKdTree(int3 *points, KDNode *tree, int n) {
 }
 
 void cpu() {
-    int3 *points = new int[N]];
+    int3 *points = new int3[N];
     KDNode *tree = new KDNode[N];
 
     generatePoints(points, N);
