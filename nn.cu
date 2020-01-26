@@ -18,6 +18,7 @@ typedef struct __align__(16) {
 } KDNode;
 
 void runAndTime(void (*f)());
+void generatePoints(int3 *points, int n);
 void cpu();
 void gpu();
 
@@ -25,8 +26,13 @@ void gpu();
 int main() {
     srand(16);
 
-    runAndTime(cpu);
-    runAndTime(gpu);
+    int3 *points;
+    eChk(cudaMallocManaged(&points, N * sizeof(int3)));
+
+    runAndTime([]() -> void { cpu(points); });
+    runAndTime([]() -> void { gpu(points); });
+
+    eChk(cudaFree(points));
 }
 
 void runAndTime(void (*f)())
@@ -45,29 +51,34 @@ void generatePoints(int3 *points, int n) {
 }
 
 void buildKdTree(int3 *points, KDNode *tree, int n) {
+
     for(int i = 0; i < n; i++) {
         tree[i] = { .value = points[i] };
     }
 }
 
-void cpu() {
-    int3 *points = new int3[N];
-    KDNode *tree = new KDNode[N];
+void cpu(int3 *points) {
+    int treeSize = 1;
+    while(treeSize > N) treeSize <<= 1;
+
+    KDNode *tree = new KDNode[treeSize];
 
     generatePoints(points, N);
     buildKdTree(points, tree, N);
 }
 
-void gpu()
+void gpu(int3 *points)
 {
+    int treeSize = 1;
+    while(treeSize > N)treeSize <<= 1;
+
     int3 *points;
     KDNode *tree;
 
-    eChk(cudaMallocManaged(&points, N * sizeof(int3)));
-    eChk(cudaMallocManaged(&tree, N * sizeof(KDNode)));
+    eChk(cudaMallocManaged(&tree, treeSize * sizeof(KDNode)));
 
     generatePoints(points, N);
     buildKdTree(points, tree, N);
 
-    eChk(cudaFree(points));
+    eChk(cudaFree(tree));
 }
