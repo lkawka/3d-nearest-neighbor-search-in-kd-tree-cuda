@@ -10,7 +10,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
    }
 }
 
-const int N = 5;
+const int N = 5, DIM_SIZE = 3;
 
 typedef struct __align__(16) {
     int3 value;
@@ -38,15 +38,36 @@ void runAndTime(void (*f)())
     std::cout << "Elapsed time in milliseconds : " << duration << "ms\n\n";
 }
 
-void cpu() {
+void generatePoints(int3 *points, int n) {
+    for(int i = 0; i < n; i++) {
+        points[i] = make_int3(rand()%100, rand()%100, rand()%100);
+    }
+}
 
+void buildKdTree(int3 *points, KDNode *tree, int n) {
+    for(int i = 0; i < n; i++) {
+        tree[i] = { .value = points[i] };
+    }
+}
+
+void cpu() {
+    int3 *points = new int[N]];
+    KDNode *tree = new KDNode[N];
+
+    generatePoints(points, N);
+    buildKdTree(points, tree, N);
 }
 
 void gpu()
 {
     int3 *points;
+    KDNode *tree;
 
     eChk(cudaMallocManaged(&points, N * sizeof(int3)));
+    eChk(cudaMallocManaged(&tree, N * sizeof(KDNode)));
+
+    generatePoints(points, N);
+    buildKdTree(points, tree, N);
 
     eChk(cudaFree(points));
 }
