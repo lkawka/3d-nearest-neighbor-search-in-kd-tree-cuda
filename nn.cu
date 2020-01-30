@@ -159,6 +159,8 @@ void gpu(int3 *tree, int treeSize, int3 *queries, int nQueries)
 
     nearestNeighborGPU<<<1, 256>>>(tree, treeSize, queries, results, nQueries);
 
+    eChk(cudaDeviceSynchronize());
+
     print(results, nQueries);
     eChk(cudaFree(results));
 }
