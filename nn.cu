@@ -39,6 +39,8 @@ int main() {
     buildKDTree(points, tree, N_POINTS, TREE_SIZE);
     generatePoints(queries, N_QUERIES);
 
+
+    std::cout<<"Points generated and tree built\n";
     runAndTime(cpu, tree, TREE_SIZE, queries, N_QUERIES);
     runAndTime(gpu, tree, TREE_SIZE, queries, N_QUERIES);
 
