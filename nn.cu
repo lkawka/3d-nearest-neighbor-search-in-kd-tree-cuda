@@ -71,7 +71,7 @@ void buildSubTree(int3 *points, int3 *tree, int start, int end, int depth, int n
         return;
     }
 
-    std::cout<<"vals: "<<start<<" "<<end<<" "<<(start+end)/2<<std::endl;
+    std::cout<<"vals: "<<start<<" "<<end<<" "<<(start+end-1)/2<<std::endl;
     print(points+start, end-start);
     std::sort(points+start, points+end, [depth](int3 p1, int3 p2) -> bool {
         if(depth % 3 == 0) return p1.x < p2.x;
@@ -79,7 +79,7 @@ void buildSubTree(int3 *points, int3 *tree, int start, int end, int depth, int n
         return p1.z < p2.z;
     });
 
-    int split = (start + end)/2;
+    int split = (start + end-1)/2;
 
     tree[node].x = points[split].x;
     tree[node].y = points[split].y;
