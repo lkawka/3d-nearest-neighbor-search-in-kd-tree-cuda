@@ -100,7 +100,7 @@ void print(int3 *points, int n) {
 }
 
 __device__ __host__ int3 closer(int3 p, int3 p2, int3 p3) {
-    if((pow(p.x-p2.x)+pow(p.y-p2.y)+pow(p.z-p2.z)) < (pow(p.x-p3.x)+pow(p.y-p3.y)+pow(p.z-p3.z))) {
+    if((pow((double)(p.x-p2.x))+pow((double)(p.y-p2.y))+pow((double)(p.z-p2.z))) < (pow((double)(p.x-p3.x))+pow((double)(p.y-p3.y))+pow((double)(p.z-p3.z)))) {
         return p2;
     }
     return p3;
@@ -123,11 +123,11 @@ __device__ __host__ int3 findNearestNeighbor(int3 *tree, int treeSize, int treeN
 
     if(val1 < val2) {
         if(treeNode*2 < treeSize && tree[treeSize*2].x != -INF && tree[treeSize*2].y != -INF && tree[treeSize*2].z != -INF) {
-            return closer(result, findNearestNeighbor(tree, treeSize, treeNode*2, depth+1, query));
+            return closer(query, result, findNearestNeighbor(tree, treeSize, treeNode*2, depth+1, query));
         }
     } else if(val1 > val2) {
         if(treeNode*2+1 < treeSize && tree[treeSize*2+1].x != -INF && tree[treeSize*2+1].y != -INF && tree[treeSize*2+1].z != -INF) {
-            return closer(result, findNearestNeighbor(tree, treeSize, treeNode*2+1, depth+1, query));
+            return closer(query, result, findNearestNeighbor(tree, treeSize, treeNode*2+1, depth+1, query));
         }
     }
     return result;
@@ -144,7 +144,7 @@ void cpu(int3 *tree, int treeSize, int3 *queries, int nQueries) {
     print(results, nQueries);
 }
 
-__global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results int nQueries) {
+__global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
 
     if(index < nQueries) {
@@ -155,7 +155,7 @@ __global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3
 void gpu(int3 *tree, int treeSize, int3 *queries, int nQueries)
 {
     int3 results;
-    results = eChk(cudaMallocManaged(&results, nQueries * sizeof(int3)));
+    eChk(cudaMallocManaged(&results, nQueries * sizeof(int3)));
 
     nearestNeighborGPU<<<1, 256>>>(tree, treeSize, queries, results, nQueries);
 
