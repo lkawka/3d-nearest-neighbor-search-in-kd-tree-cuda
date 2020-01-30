@@ -78,13 +78,15 @@ void buildSubTree(int3 *points, int3 *tree, int start, int end, int depth, int n
         if(depth % 3 == 1) return p1.y < p2.y;
         return p1.z < p2.z;
     });
-    print(points+start, end-start);
 
     int split = (start + end)/2;
 
     tree[node].x = points[split].x;
     tree[node].y = points[split].y;
     tree[node].z = points[split].z;
+
+    print(points+start, end-start);
+    print(points+split, 1);
 
     buildSubTree(points, tree, start, split, depth+1, node*2);
     buildSubTree(points, tree, split+1, end, depth+1, node*2 + 1);
