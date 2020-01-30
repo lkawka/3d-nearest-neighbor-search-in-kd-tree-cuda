@@ -13,12 +13,12 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 const int N_POINTS = 5, N_QUERIES = 5, INF = 1e9;
 
-void runAndTime(void (*f)(int3*, int, int3*, int), int3 *tree, int tree_size, int3 *queries, int nQueries);
+void runAndTime(void (*f)(int3*, int, int3*, int), int3 *tree, int treeSize, int3 *queries, int nQueries);
 void print(int3 *points, int n);
 void generatePoints(int3 *points, int n);
 void buildKDTree(int3 *points, int3 *tree, int n, int m);
-void cpu(int3 *tree, int tree_size, int3 *queries, int nQueries);
-void gpu(int3 *tree, int tree_size, int3 *queries, int nQueries);
+void cpu(int3 *tree, int treeSize, int3 *queries, int nQueries);
+void gpu(int3 *tree, int treeSize, int3 *queries, int nQueries);
 
 
 int main() {
@@ -48,10 +48,10 @@ int main() {
     eChk(cudaFree(queries));
 }
 
-void runAndTime(void (*f)(int3*, int, int3*, int), int3 *tree, int tree_size, int3 *queries, int nQueries)
+void runAndTime(void (*f)(int3*, int, int3*, int), int3 *tree, int treeSize, int3 *queries, int nQueries)
 {
     auto start = std::chrono::system_clock::now();
-    f(tree, tree_size, queries, nQueries);
+    f(tree, treeSize, queries, nQueries);
     auto end = std::chrono::system_clock::now();
     float duration = 1000.0 * std::chrono::duration<float>(end - start).count();
     std::cout << "Elapsed time in milliseconds : " << duration << "ms\n\n";
@@ -65,13 +65,10 @@ void generatePoints(int3 *points, int n) {
 
 
 void buildSubTree(int3 *points, int3 *tree, int start, int end, int depth, int node) {
-    
     if(start >= end) {
         return;
     }
 
-    std::cout<<"vals: "<<start<<" "<<end<<" "<<(start+end-1)/2<<std::endl;
-    print(points+start, end-start);
     std::sort(points+start, points+end, [depth](int3 p1, int3 p2) -> bool {
         if(depth % 3 == 0) return p1.x < p2.x;
         if(depth % 3 == 1) return p1.y < p2.y;
@@ -91,8 +88,8 @@ void buildSubTree(int3 *points, int3 *tree, int start, int end, int depth, int n
     buildSubTree(points, tree, split+1, end, depth+1, node*2 + 1);
 }
 
-void buildKDTree(int3 *points, int3 *tree, int n, int tree_size) {
-    for(int i = 0; i < tree_size; i++) {
+void buildKDTree(int3 *points, int3 *tree, int n, int treeSize) {
+    for(int i = 0; i < treeSize; i++) {
         tree[i] = make_int3(-INF, -INF, -INF);
     }
 
@@ -106,12 +103,43 @@ void print(int3 *points, int n) {
     std::cout<<std::endl;
 }
 
-void cpu(int3 *tree, int tree_size, int3 *queries, int nQueries) {
-    print(tree+1, tree_size-1);
-    print(queries, nQueries);
+int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int depth, int3 query) {
+    int val1, val2;
+    if(depth % 3 == 0) {
+        val1 = tree[treeNode].x;
+        val2 = query.x;
+    } else if(
+        val1 = tree[treeNode].y;
+        val2 = query.y;
+    ) else {
+        val1 = tree[treeNode].z;
+        val2 = query.z;
+    }
+
+    if(val1 < val2) {
+        if(treeNode*2 < treeSize && tree[treeSize*2] != make_int3(-INF, -INF, -INF)) {
+            return findNearestNeighbor(tree, treeSize, treeNode*2, query);
+        }
+    } else if(val1 > val2) {
+        if(treeNode*2+1 < treeSize && tree[treeSize*2+1] != make_int3(-INF, -INF, -INF)) {
+            return findNearestNeighbor(tree, treeSize, treeNode*2+1, query);
+        }
+    }
+    return tree[treeNode];
 }
 
-void gpu(int3 *tree, int tree_size, int3 *queries, int nQueries)
+void cpu(int3 *tree, int treeSize, int3 *queries, int nQueries) {
+    int3 *results = new int3[nQueries];
+
+    for(int i = 0; i < nQueries; i++) {
+        results[i] = findNearestNeighbor(tree, treeSize, 1, 0, queries[i]);
+    }
+
+    print(queries, nQueries);
+    print(results, nQueries);
+}
+
+void gpu(int3 *tree, int treeSize, int3 *queries, int nQueries)
 {
     
 }
