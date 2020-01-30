@@ -30,8 +30,6 @@ int main() {
     int3 *tree;
     int3 *queries;
 
-    auto start = std::chrono::system_clock::now();
-
     eChk(cudaMallocManaged(&points, N_POINTS * sizeof(int3)));
     eChk(cudaMallocManaged(&tree, TREE_SIZE * sizeof(int3)));
     eChk(cudaMallocManaged(&queries, N_QUERIES * sizeof(int3)));
@@ -39,6 +37,8 @@ int main() {
     generatePoints(points, N_POINTS);
     buildKDTree(points, tree, N_POINTS, TREE_SIZE);
     generatePoints(queries, N_QUERIES);
+
+    auto start = std::chrono::system_clock::now();
 
     int3 *results;
     eChk(cudaMallocManaged(&results, N_QUERIES * sizeof(int3)));
