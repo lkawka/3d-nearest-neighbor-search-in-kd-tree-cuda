@@ -2,6 +2,7 @@
 #include <chrono>
 #include <time.h>
 #include <algorithm>
+#include <math.h>
 
 #define eChk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true) {
@@ -98,29 +99,38 @@ void print(int3 *points, int n) {
     std::cout<<std::endl;
 }
 
-int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int depth, int3 query) {
+__device__ __host__ int3 closer(int3 p, int3 p2, int3 p3) {
+    if((pow(p.x-p2.x)+pow(p.y-p2.y)+pow(p.z-p2.z)) < (pow(p.x-p3.x)+pow(p.y-p3.y)+pow(p.z-p3.z))) {
+        return p2;
+    }
+    return p3;
+}
+
+__device__ __host__ int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int depth, int3 query) {
+    int3 result = tree[treeNode];
+
     int val1, val2;
     if(depth % 3 == 0) {
-        val1 = tree[treeNode].x;
+        val1 = result.x;
         val2 = query.x;
     } else if(depth % 3 == 1) {
-        val1 = tree[treeNode].y;
+        val1 = result.y;
         val2 = query.y;
     } else {
-        val1 = tree[treeNode].z;
+        val1 = result.z;
         val2 = query.z;
     }
 
     if(val1 < val2) {
         if(treeNode*2 < treeSize && tree[treeSize*2].x != -INF && tree[treeSize*2].y != -INF && tree[treeSize*2].z != -INF) {
-            return findNearestNeighbor(tree, treeSize, treeNode*2, depth+1, query);
+            return closer(result, findNearestNeighbor(tree, treeSize, treeNode*2, depth+1, query));
         }
     } else if(val1 > val2) {
         if(treeNode*2+1 < treeSize && tree[treeSize*2+1].x != -INF && tree[treeSize*2+1].y != -INF && tree[treeSize*2+1].z != -INF) {
-            return findNearestNeighbor(tree, treeSize, treeNode*2+1, depth+1, query);
+            return closer(result, findNearestNeighbor(tree, treeSize, treeNode*2+1, depth+1, query));
         }
     }
-    return tree[treeNode];
+    return result;
 }
 
 void cpu(int3 *tree, int treeSize, int3 *queries, int nQueries) {
@@ -134,7 +144,21 @@ void cpu(int3 *tree, int treeSize, int3 *queries, int nQueries) {
     print(results, nQueries);
 }
 
+__global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results int nQueries) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if(index < nQueries) {
+        results[index] = findNearestNeighbor(tree, treeSize, 1, 0, queries[index]);
+    }
+}
+
 void gpu(int3 *tree, int treeSize, int3 *queries, int nQueries)
 {
-    
+    int3 results;
+    results = eChk(cudaMallocManaged(&results, nQueries * sizeof(int3)));
+
+    eChk(nearestNeighborGPU<<<1, 256>>>(tree, treeSize, queries, results, nQueries));
+
+    print(results, nQueries);
+    eChk(cudaFree(results));
 }
