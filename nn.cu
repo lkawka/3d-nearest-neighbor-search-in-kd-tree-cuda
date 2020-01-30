@@ -75,7 +75,7 @@ void buildSubTree(int3 *points, int3 *tree, int start, int end, int depth, int n
     buildSubTree(points, tree, split+1, end, depth+1, node*2 + 1);
 }
 
-void buildKdTree(int3 *points, int3 *tree, int n, int m) {
+void buildKDTree(int3 *points, int3 *tree, int n, int m) {
     buildSubTree(points, tree, 0, n, 0, 1);
 }
 
