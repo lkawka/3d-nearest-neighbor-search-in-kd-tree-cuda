@@ -91,7 +91,7 @@ void print(int3 *points, int n) {
 
 void cpu(int3 *points, int3 *tree, int n, int m) {
     print(points, n);
-    print(tree, m);
+    print(tree+1, n);
 }
 
 void gpu(int3 *points, int3 *tree, int n, int m)
