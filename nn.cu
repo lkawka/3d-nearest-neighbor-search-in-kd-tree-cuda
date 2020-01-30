@@ -43,16 +43,10 @@ int main() {
     int3 *results;
     eChk(cudaMallocManaged(&results, N_QUERIES * sizeof(int3)));
 
-    nearestNeighborGPU<<<512, 256>>>(tree, TREE_SIZE, queries, results, N_QUERIES);
+    nearestNeighborGPU<<<256, 512>>>(tree, TREE_SIZE, queries, results, N_QUERIES);
 
     eChk(cudaDeviceSynchronize());
 
-    int zeros = 0;
-    for(int i = 0; i < N_QUERIES; i++) {
-        if(queries[i].x == 0 && queries[i].y == 0 && queries[i].z == 0) {
-            zeros++;
-        }
-    }
     std::cout<<"zeros: "<<zeros<<std::endl;
     
     auto end = std::chrono::system_clock::now();
