@@ -67,7 +67,6 @@ void generatePoints(int3 *points, int n) {
 void buildSubTree(int3 *points, int3 *tree, int start, int end, int depth, int node) {
     
     if(start+1 >= end) {
-        tree[node] = points[start];
         return;
     }
 
