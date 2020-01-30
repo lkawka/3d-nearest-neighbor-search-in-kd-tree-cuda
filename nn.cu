@@ -65,18 +65,20 @@ void generatePoints(int3 *points, int n) {
 
 
 void buildSubTree(int3 *points, int3 *tree, int start, int end, int depth, int node) {
-    std::cout<<"vals: "<<start<<" "<<end<<" "<<(start+end)/2<<std::endl;
-
+    
     if(start+1 >= end) {
         tree[node] = points[start];
         return;
     }
 
+    std::cout<<"vals: "<<start<<" "<<end<<" "<<(start+end)/2<<std::endl;
+    print(points+start, end-start);
     std::sort(points+start, points+end, [depth](int3 p1, int3 p2) -> bool {
         if(depth % 3 == 0) return p1.x < p2.x;
         if(depth % 3 == 1) return p1.y < p2.y;
         return p1.z < p2.z;
     });
+    print(points+start, end-start);
 
     int split = (start + end)/2;
 
