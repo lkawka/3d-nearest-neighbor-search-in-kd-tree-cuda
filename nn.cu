@@ -12,7 +12,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
    }
 }
 
-const int N_POINTS = 1e6, N_QUERIES = 1e6, INF = 1e9;
+const int N_POINTS = 1e6, N_QUERIES = 1e5, INF = 1e9;
 
 void runAndTime(void (*f)(int3*, int, int3*, int), int3 *tree, int treeSize, int3 *queries, int nQueries);
 void print(int3 *points, int n);
@@ -142,6 +142,7 @@ void cpu(int3 *tree, int treeSize, int3 *queries, int nQueries) {
 
     // print(queries, nQueries);
     // print(results, nQueries);
+    std::cout<<"CPU done\n";
 }
 
 __global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries) {
