@@ -38,8 +38,6 @@ int main() {
     buildKDTree(points, tree, N_POINTS, TREE_SIZE);
     generatePoints(queries, N_QUERIES);
 
-    print(points, N_POINTS);
-
     runAndTime(cpu, tree, TREE_SIZE, queries, N_QUERIES);
     runAndTime(gpu, tree, TREE_SIZE, queries, N_QUERIES);
 
@@ -80,9 +78,6 @@ void buildSubTree(int3 *points, int3 *tree, int start, int end, int depth, int n
     tree[node].x = points[split].x;
     tree[node].y = points[split].y;
     tree[node].z = points[split].z;
-
-    print(points+start, end-start);
-    print(points+split, 1);
 
     buildSubTree(points, tree, start, split, depth+1, node*2);
     buildSubTree(points, tree, split+1, end, depth+1, node*2 + 1);
