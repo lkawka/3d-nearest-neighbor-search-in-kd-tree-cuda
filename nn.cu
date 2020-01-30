@@ -142,3 +142,11 @@ __device__ int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int 
     }
     return node;
 }
+
+__global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if(index < nQueries) {
+        results[index] = findNearestNeighbor(tree, treeSize, 1, 0, queries[index]);
+    }
+}
