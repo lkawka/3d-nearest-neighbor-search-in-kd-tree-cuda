@@ -2,7 +2,6 @@
 #include <chrono>
 #include <time.h>
 #include <algorithm>
-#include <limits.h>
 
 #define eChk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true) {
@@ -12,7 +11,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
    }
 }
 
-const int N_POINTS = 5, N_QUERIES = 5;
+const int N_POINTS = 5, N_QUERIES = 5, INF = 1e9;
 
 void runAndTime(void (*f)(int3*, int, int3*, int), int3 *tree, int tree_size, int3 *queries, int nQueries);
 void print(int3 *points, int n);
@@ -84,8 +83,8 @@ void buildSubTree(int3 *points, int3 *tree, int start, int end, int depth, int n
 }
 
 void buildKDTree(int3 *points, int3 *tree, int n, int tree_size) {
-    for(int i = 0; i < tree_size, i++) {
-        tree[i] = make_int3(MIN_INT, MIN_INT, MIN_INT);
+    for(int i = 0; i < tree_size; i++) {
+        tree[i] = make_int3(-INF, -INF, -INF);
     }
 
     buildSubTree(points, tree, 0, n, 0, 1);
