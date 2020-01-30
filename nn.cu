@@ -11,14 +11,14 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
    }
 }
 
-const int N_POINTS = 5, DIM_SIZE = 3;
+const int N_POINTS = 5, N_QUERIES = 5;
 
-void runAndTime(void (*f)(int3*, int3*, int, int), int3 *points, int3 *tree, int n, int m);
+void runAndTime(void (*f)(int3*, int, int3*, int), int3 *tree, int tree_size, int3 *queries, int nQueries);
 void print(int3 *points, int n);
 void generatePoints(int3 *points, int n);
 void buildKDTree(int3 *points, int3 *tree, int n, int m);
-void cpu(int3 *points, int3 *tree, int n, int m);
-void gpu(int3 *points, int3 *tree, int n, int m);
+void cpu(int3 *tree, int tree_size, int3 *queries, int nQueries);
+void gpu(int3 *tree, int tree_size, int3 *queries, int nQueries);
 
 
 int main() {
@@ -29,18 +29,22 @@ int main() {
 
     int3 *points;
     int3 *tree;
+    int3 *queries;
     eChk(cudaMallocManaged(&points, N_POINTS * sizeof(int3)));
+    eChk(cudaMallocManaged(&queries, N_QUERIES * sizeof(int3)));
 
     generatePoints(points, N_POINTS);
     buildKDTree(points, tree, N_POINTS, TREE_SIZE);
+    generatePoints(queries, N_QUERIES);
 
-    runAndTime(cpu, points, tree, N_POINTS, TREE_SIZE);
-    runAndTime(gpu, points, tree, N_POINTS, TREE_SIZE);
+    runAndTime(cpu, tree, TREE_SIZE, queries, N_QUERIES);
+    runAndTime(gpu, tree, TREE_SIZE, queries, N_QUERIES);
 
     eChk(cudaFree(points));
+    eChk(cudaFree(queries));
 }
 
-void runAndTime(void (*f)(int3*, int3*, int, int), int3 *points, int3 *tree, int n, int m)
+void runAndTime(void (*f)(int3*, int, int3*, int), int3 *tree, int tree_size, int3 *queries, int nQueries)
 {
     auto start = std::chrono::system_clock::now();
     f(points, tree, n, m);
@@ -62,13 +66,11 @@ void buildSubTree(int3 *points, int3 *tree, int start, int end, int depth, int n
         return;
     }
 
-    print(points+start, end-start);
     std::sort(points+start, points+end, [depth](int3 p1, int3 p2) -> bool {
         if(depth % 3 == 0) return p1.x < p2.x;
         if(depth % 3 == 1) return p1.y < p2.y;
         return p1.z < p2.z;
     });
-    print(points+start, end-start);
 
     int split = (start + end)/2;
 
@@ -89,12 +91,12 @@ void print(int3 *points, int n) {
     std::cout<<std::endl;
 }
 
-void cpu(int3 *points, int3 *tree, int n, int m) {
-    print(points, n);
-    print(tree+1, n);
+void cpu(int3 *tree, int tree_size, int3 *queries, int nQueries) {
+    print(tree+1, tree_size);
+    print(queries, nQueries);
 }
 
-void gpu(int3 *points, int3 *tree, int n, int m)
+void gpu(int3 *tree, int tree_size, int3 *queries, int nQueries)
 {
     
 }
