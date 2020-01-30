@@ -14,6 +14,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 const int N_POINTS = 5, DIM_SIZE = 3;
 
 void runAndTime(void (*f)(int3*, int3*, int, int), int3 *points, int3 *tree, int n, int m);
+void print(int3 *points, int n);
 void generatePoints(int3 *points, int n);
 void buildKDTree(int3 *points, int3 *tree, int n, int m);
 void cpu(int3 *points, int3 *tree, int n, int m);
