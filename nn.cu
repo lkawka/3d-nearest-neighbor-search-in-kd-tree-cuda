@@ -81,7 +81,7 @@ void buildKDTree(int3 *points, int3 *tree, int n, int m) {
 
 void print(int3 *points, int n) {
     for(int i = 0; i < n; i++) {
-        std::cout<<"["<<points[i].x<<points[i].y<<points[i].z<<"] ";
+        std::cout<<"["<<points[i].x<<", "<<points[i].y<<", "<<points[i].z<<"] ";
     }
     std::cout<<std::endl;
 }
