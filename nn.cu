@@ -1,6 +1,7 @@
 #include <iostream>
 #include <chrono>
 #include <time.h>
+#include <algorithm>
 
 #define eChk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true) {
@@ -29,11 +30,11 @@ int main() {
     int3 *tree;
     eChk(cudaMallocManaged(&points, N_POINTS * sizeof(int3)));
 
-    generatePoints(points);
+    generatePoints(points, N_POINTS);
     buildKDTree(points, tree, N_POINTS, TREE_SIZE);
 
-    runAndTime([]() -> void { cpu(points, tree); });
-    runAndTime([]() -> void { gpu(points, tree); });
+    runAndTime([&]() -> void { cpu(points, tree); });
+    runAndTime([&]() -> void { gpu(points, tree); });
 
     eChk(cudaFree(points));
 }
@@ -60,7 +61,7 @@ void buildSubTree(int3 *points, int3 *tree, int start, int end, int depth, int n
         return;
     }
 
-    std::sort(points+start, points+end, [](int3 p1, int3 p2) -> bool {
+    std::sort(points+start, points+end, [depth](int3 p1, int3 p2) -> bool {
         if(depth % 3 == 0) return p1.x < p2.x;
         if(depth % 3 == 1) return p1.y < p2.y;
         return p1.z < p2.z;
