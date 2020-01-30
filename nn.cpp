@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <math.h>
 
-const int N_POINTS = 1e5, N_QUERIES = 1e6, INF = 1e9;
+const int N_POINTS = 1e4, N_QUERIES = 1e6, INF = 1e9;
 
 struct int3
 {
