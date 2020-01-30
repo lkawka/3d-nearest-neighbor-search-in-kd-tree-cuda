@@ -100,7 +100,7 @@ void print(int3 *points, int n) {
 }
 
 __device__ __host__ int3 closer(int3 p, int3 p2, int3 p3) {
-    if((pow((double)(p.x-p2.x))+pow((double)(p.y-p2.y))+pow((double)(p.z-p2.z))) < (pow((double)(p.x-p3.x))+pow((double)(p.y-p3.y))+pow((double)(p.z-p3.z)))) {
+    if((pow((double)(p.x-p2.x), 2)+pow((double)(p.y-p2.y), 2)+pow((double)(p.z-p2.z), 2)) < (pow((double)(p.x-p3.x), 2)+pow((double)(p.y-p3.y), 2)+pow((double)(p.z-p3.z), 2))) {
         return p2;
     }
     return p3;
@@ -154,7 +154,7 @@ __global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3
 
 void gpu(int3 *tree, int treeSize, int3 *queries, int nQueries)
 {
-    int3 results;
+    int3 *results;
     eChk(cudaMallocManaged(&results, nQueries * sizeof(int3)));
 
     nearestNeighborGPU<<<1, 256>>>(tree, treeSize, queries, results, nQueries);
