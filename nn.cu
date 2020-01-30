@@ -108,7 +108,7 @@ int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int depth, int3
     if(depth % 3 == 0) {
         val1 = tree[treeNode].x;
         val2 = query.x;
-    } else if{
+    } else if(depth % 3 == 1) {
         val1 = tree[treeNode].y;
         val2 = query.y;
     } else {
