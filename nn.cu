@@ -157,7 +157,7 @@ void gpu(int3 *tree, int treeSize, int3 *queries, int nQueries)
     int3 results;
     results = eChk(cudaMallocManaged(&results, nQueries * sizeof(int3)));
 
-    eChk(nearestNeighborGPU<<<1, 256>>>(tree, treeSize, queries, results, nQueries));
+    nearestNeighborGPU<<<1, 256>>>(tree, treeSize, queries, results, nQueries);
 
     print(results, nQueries);
     eChk(cudaFree(results));
