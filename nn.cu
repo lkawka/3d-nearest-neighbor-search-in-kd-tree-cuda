@@ -64,14 +64,13 @@ __host__ void generatePoints(int3 *points, int n) {
 __host__ void buildSubTree(int3 *points, int3 *tree, int start, int end, int depth, int node) {
     if(start >= end) return;
 
-    std::sort(points+start, points+end, [depth](int3 p1, int3 p2) -> bool {
+    std::sort(points + start, points + end, [depth](int3 p1, int3 p2) -> bool {
         if(depth % 3 == 0) return p1.x < p2.x;
         if(depth % 3 == 1) return p1.y < p2.y;
         return p1.z < p2.z;
     });
 
     int split = (start + end-1)/2;
-
     tree[node] = points[split];
 
     buildSubTree(points, tree, start, split, depth+1, node*2);
@@ -136,8 +135,7 @@ __device__ int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int 
         int3 rightChild = tree[treeSize * 2];
         if (rightChild.x != -INF && rightChild.y != -INF && rightChild.z != -INF)
         {
-            return getCloser
-        (query, node, findNearestNeighbor(tree, treeSize, treeNode * 2 + 1, depth + 1, query));
+            return getCloser(query, node, findNearestNeighbor(tree, treeSize, treeNode * 2 + 1, depth + 1, query));
         }
     }
     return node;
