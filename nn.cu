@@ -19,7 +19,6 @@ __host__ void generatePoints(int3 *points, int n);
 __host__ void buildKDTree(int3 *points, int3 *tree, int n, int m);
 __global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries);
 
-
 int main() {
     srand(16);
 
@@ -43,7 +42,7 @@ int main() {
     int3 *results;
     eChk(cudaMallocManaged(&results, N_QUERIES * sizeof(int3)));
 
-    nearestNeighborGPU<<<256, 512>>>(tree, TREE_SIZE, queries, results, N_QUERIES);
+    nearestNeighborGPU<<<512, 16>>>(tree, TREE_SIZE, queries, results, N_QUERIES);
     eChk(cudaDeviceSynchronize());
     
     auto end = std::chrono::system_clock::now();
@@ -94,7 +93,7 @@ void print(int3 *points, int n) {
     std::cout<<std::endl;
 }
 
-__device__ int3 closer(int3 p, int3 p2, int3 p3)
+__device__ int3 getCloser(int3 p, int3 p2, int3 p3)
 {
     if ((pow(p.x - p2.x, 2) + pow(p.y - p2.y, 2) + pow(p.z - p2.z, 2)) < (pow(p.x - p3.x, 2) + pow(p.y - p3.y, 2) + pow(p.z - p3.z, 2)))
     {
@@ -129,7 +128,7 @@ __device__ int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int 
         int3 leftChild = tree[treeSize * 2];
         if (leftChild.x != -INF && leftChild.y != -INF && leftChild.z != -INF)
         {
-            return closer(query, node, findNearestNeighbor(tree, treeSize, treeNode * 2, depth + 1, query));
+            return getCloser(query, node, findNearestNeighbor(tree, treeSize, treeNode * 2, depth + 1, query));
         }
     }
     else if ((val1 > val2) && (treeNode * 2 + 1 < treeSize))
@@ -137,7 +136,8 @@ __device__ int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int 
         int3 rightChild = tree[treeSize * 2];
         if (rightChild.x != -INF && rightChild.y != -INF && rightChild.z != -INF)
         {
-            return closer(query, node, findNearestNeighbor(tree, treeSize, treeNode * 2 + 1, depth + 1, query));
+            return getCloser
+        (query, node, findNearestNeighbor(tree, treeSize, treeNode * 2 + 1, depth + 1, query));
         }
     }
     return node;
