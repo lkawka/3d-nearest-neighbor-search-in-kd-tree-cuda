@@ -38,6 +38,8 @@ int main() {
     buildKDTree(points, tree, N_POINTS, TREE_SIZE);
     generatePoints(queries, N_QUERIES);
 
+    print(points, N_POINTS);
+
     runAndTime(cpu, tree, TREE_SIZE, queries, N_QUERIES);
     runAndTime(gpu, tree, TREE_SIZE, queries, N_QUERIES);
 
