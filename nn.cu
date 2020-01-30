@@ -80,7 +80,9 @@ void buildSubTree(int3 *points, int3 *tree, int start, int end, int depth, int n
 
     int split = (start + end)/2;
 
-    tree[node] = points[split];
+    tree[node].x = points[split].x;
+    tree[node].y = points[split].y;
+    tree[node].z = points[split].z;
 
     buildSubTree(points, tree, start, split, depth+1, node*2);
     buildSubTree(points, tree, split+1, end, depth+1, node*2 + 1);
@@ -102,7 +104,7 @@ void print(int3 *points, int n) {
 }
 
 void cpu(int3 *tree, int tree_size, int3 *queries, int nQueries) {
-    print(tree+1, tree_size);
+    print(tree+1, tree_size-1);
     print(queries, nQueries);
 }
 
