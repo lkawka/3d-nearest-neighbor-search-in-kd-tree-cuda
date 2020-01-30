@@ -46,8 +46,6 @@ int main() {
     nearestNeighborGPU<<<256, 512>>>(tree, TREE_SIZE, queries, results, N_QUERIES);
 
     eChk(cudaDeviceSynchronize());
-
-    std::cout<<"zeros: "<<zeros<<std::endl;
     
     auto end = std::chrono::system_clock::now();
     float duration = 1000.0 * std::chrono::duration<float>(end - start).count();
