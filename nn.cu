@@ -40,9 +40,9 @@ int main() {
     auto start = std::chrono::system_clock::now();
 
     int3 *results;
-    eChk(cudaMallocManaged(&results, nQueries * sizeof(int3)));
+    eChk(cudaMallocManaged(&results, N_QUERIES * sizeof(int3)));
 
-    nearestNeighborGPU<<<1, 256>>>(tree, treeSize, queries, results, nQueries);
+    nearestNeighborGPU<<<1, 256>>>(tree, TREE_SIZE, queries, results, N_QUERIES);
 
     eChk(cudaDeviceSynchronize());
     
