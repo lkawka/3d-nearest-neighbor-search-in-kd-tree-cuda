@@ -10,27 +10,30 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
    }
 }
 
-const int N = 5, DIM_SIZE = 3;
-
-typedef struct __align__(16) {
-    int3 value;
-    int splitDim;
-} KDNode;
+const int N_POINTS = 5, DIM_SIZE = 3;
 
 void runAndTime(void (*f)());
 void generatePoints(int3 *points, int n);
-void cpu();
-void gpu();
+void buildKDTree(int3 *points, int3 *tree, int n, int m);
+void cpu(int3 *points, int3 *tree, int n, int m);
+void gpu(int3 *points, int3 *tree, int n, int m);
 
 
 int main() {
     srand(16);
 
-    int3 *points;
-    eChk(cudaMallocManaged(&points, N * sizeof(int3)));
+    int TREE_SIZE = 1;
+    while(TREE_SIZE < N_POINTS) TREE_SIZE <<= 1;
 
-    runAndTime([]() -> void { cpu(points); });
-    runAndTime([]() -> void { gpu(points); });
+    int3 *points;
+    int3 *tree;
+    eChk(cudaMallocManaged(&points, N_POINTS * sizeof(int3)));
+
+    generatePoints(points);
+    buildKDTree(points, tree, N_POINTS, TREE_SIZE);
+
+    runAndTime([]() -> void { cpu(points, tree); });
+    runAndTime([]() -> void { gpu(points, tree); });
 
     eChk(cudaFree(points));
 }
@@ -50,35 +53,44 @@ void generatePoints(int3 *points, int n) {
     }
 }
 
-void buildKdTree(int3 *points, KDNode *tree, int n) {
 
-    for(int i = 0; i < n; i++) {
-        tree[i] = { .value = points[i] };
+void buildSubTree(int3 *points, int3 *tree, int start, int end, int depth, int node) {
+    if(start == end) {
+        tree[node] = points[start];
+        return;
     }
+
+    std::sort(points+start, points+end, [](int3 p1, int3 p2) -> bool {
+        if(depth % 3 == 0) return p1.x < p2.x;
+        if(depth % 3 == 1) return p1.y < p2.y;
+        return p1.z < p2.z;
+    });
+
+    int split = (start + end)/2;
+
+    tree[node] = points[split];
+
+    buildSubTree(points, tree, start, split, depth+1, node*2);
+    buildSubTree(points, tree, split+1, end, depth+1, node*2 + 1);
 }
 
-void cpu(int3 *points) {
-    int treeSize = 1;
-    while(treeSize > N) treeSize <<= 1;
-
-    KDNode *tree = new KDNode[treeSize];
-
-    generatePoints(points, N);
-    buildKdTree(points, tree, N);
+void buildKdTree(int3 *points, int3 *tree, int n, int m) {
+    buildSubTree(points, tree, 0, n, 0, 1);
 }
 
-void gpu(int3 *points)
+void print(int3 *points, int n) {
+    for(int i = 0; i < n; i++) {
+        std::cout<<"["<<points[i].x<<points[i].y<<points[i].z<<"] ";
+    }
+    std::cout<<std::endl;
+}
+
+void cpu(int3 *points, int3 *tree, int n, int m) {
+    print(points, n);
+    print(points, m);
+}
+
+void gpu(int3 *points, int3 *tree, int n, int m)
 {
-    int treeSize = 1;
-    while(treeSize > N)treeSize <<= 1;
-
-    int3 *points;
-    KDNode *tree;
-
-    eChk(cudaMallocManaged(&tree, treeSize * sizeof(KDNode)));
-
-    generatePoints(points, N);
-    buildKdTree(points, tree, N);
-
-    eChk(cudaFree(tree));
+    
 }
