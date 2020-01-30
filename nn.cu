@@ -13,7 +13,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 const int N_POINTS = 5, DIM_SIZE = 3;
 
-void runAndTime(void (*f)());
+void runAndTime(void (*f)(int3*, int3*, int, int), int3 *points, int3 *tree, int n, int m);
 void generatePoints(int3 *points, int n);
 void buildKDTree(int3 *points, int3 *tree, int n, int m);
 void cpu(int3 *points, int3 *tree, int n, int m);
@@ -33,16 +33,16 @@ int main() {
     generatePoints(points, N_POINTS);
     buildKDTree(points, tree, N_POINTS, TREE_SIZE);
 
-    runAndTime([&]() -> void { cpu(points, tree); });
-    runAndTime([&]() -> void { gpu(points, tree); });
+    runAndTime(cpu, points, tree, N_POINTS, TREE_SIZE);
+    runAndTime(gpu, points, tree, N_POINTS, TREE_SIZE);
 
     eChk(cudaFree(points));
 }
 
-void runAndTime(void (*f)())
+void runAndTime(void (*f)(int3*, int3*, int, int), int3 *points, int3 *tree, int n, int m)
 {
     auto start = std::chrono::system_clock::now();
-    f();
+    f(points, tree, n, m);
     auto end = std::chrono::system_clock::now();
     float duration = 1000.0 * std::chrono::duration<float>(end - start).count();
     std::cout << "Elapsed time in milliseconds : " << duration << "ms\n\n";
