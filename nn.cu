@@ -47,7 +47,7 @@ int main() {
 void runAndTime(void (*f)(int3*, int, int3*, int), int3 *tree, int tree_size, int3 *queries, int nQueries)
 {
     auto start = std::chrono::system_clock::now();
-    f(points, tree, n, m);
+    f(tree, tree_size, queries, nQueries);
     auto end = std::chrono::system_clock::now();
     float duration = 1000.0 * std::chrono::duration<float>(end - start).count();
     std::cout << "Elapsed time in milliseconds : " << duration << "ms\n\n";
