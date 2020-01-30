@@ -108,21 +108,21 @@ int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int depth, int3
     if(depth % 3 == 0) {
         val1 = tree[treeNode].x;
         val2 = query.x;
-    } else if(
+    } else if{
         val1 = tree[treeNode].y;
         val2 = query.y;
-    ) else {
+    } else {
         val1 = tree[treeNode].z;
         val2 = query.z;
     }
 
     if(val1 < val2) {
-        if(treeNode*2 < treeSize && tree[treeSize*2] != make_int3(-INF, -INF, -INF)) {
-            return findNearestNeighbor(tree, treeSize, treeNode*2, query);
+        if(treeNode*2 < treeSize && tree[treeSize*2].x != -INF && tree[treeSize*2].y != -INF && tree[treeSize*2].z != -INF) {
+            return findNearestNeighbor(tree, treeSize, treeNode*2, depth+1, query);
         }
     } else if(val1 > val2) {
-        if(treeNode*2+1 < treeSize && tree[treeSize*2+1] != make_int3(-INF, -INF, -INF)) {
-            return findNearestNeighbor(tree, treeSize, treeNode*2+1, query);
+        if(treeNode*2+1 < treeSize && tree[treeSize*2+1].x != -INF && tree[treeSize*2+1].y != -INF && tree[treeSize*2+1].z != -INF) {
+            return findNearestNeighbor(tree, treeSize, treeNode*2+1, depth+1, query);
         }
     }
     return tree[treeNode];
