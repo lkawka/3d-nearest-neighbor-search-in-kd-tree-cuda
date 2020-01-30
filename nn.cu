@@ -15,8 +15,8 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 const int N_POINTS = 1e3, N_QUERIES = 1e6, INF = 1e9;
 
 void print(int3 *points, int n);
-void generatePoints(int3 *points, int n);
-void buildKDTree(int3 *points, int3 *tree, int n, int m);
+__host__ void generatePoints(int3 *points, int n);
+__host__ void buildKDTree(int3 *points, int3 *tree, int n, int m);
 __global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries);
 
 
@@ -29,6 +29,9 @@ int main() {
     int3 *points;
     int3 *tree;
     int3 *queries;
+
+    auto start = std::chrono::system_clock::now();
+
     eChk(cudaMallocManaged(&points, N_POINTS * sizeof(int3)));
     eChk(cudaMallocManaged(&tree, TREE_SIZE * sizeof(int3)));
     eChk(cudaMallocManaged(&queries, N_QUERIES * sizeof(int3)));
@@ -36,8 +39,6 @@ int main() {
     generatePoints(points, N_POINTS);
     buildKDTree(points, tree, N_POINTS, TREE_SIZE);
     generatePoints(queries, N_QUERIES);
-
-    auto start = std::chrono::system_clock::now();
 
     int3 *results;
     eChk(cudaMallocManaged(&results, N_QUERIES * sizeof(int3)));
@@ -56,13 +57,13 @@ int main() {
     eChk(cudaFree(queries));
 }
 
-void generatePoints(int3 *points, int n) {
+__host__ void generatePoints(int3 *points, int n) {
     for(int i = 0; i < n; i++) {
         points[i] = make_int3(rand()%100, rand()%100, rand()%100);
     }
 }
 
-void buildSubTree(int3 *points, int3 *tree, int start, int end, int depth, int node) {
+__host__ void buildSubTree(int3 *points, int3 *tree, int start, int end, int depth, int node) {
     if(start >= end) return;
 
     std::sort(points+start, points+end, [depth](int3 p1, int3 p2) -> bool {
@@ -79,7 +80,7 @@ void buildSubTree(int3 *points, int3 *tree, int start, int end, int depth, int n
     buildSubTree(points, tree, split+1, end, depth+1, node*2 + 1);
 }
 
-void buildKDTree(int3 *points, int3 *tree, int n, int treeSize) {
+__host__ void buildKDTree(int3 *points, int3 *tree, int n, int treeSize) {
     for(int i = 0; i < treeSize; i++) {
         tree[i] = make_int3(-INF, -INF, -INF);
     }

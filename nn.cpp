@@ -26,6 +26,8 @@ int main()
     while (TREE_SIZE < N_POINTS)
         TREE_SIZE <<= 1;
 
+    auto start = std::chrono::system_clock::now();
+
     int3 *points = new int3[N_POINTS];
     int3 *tree = new int3[TREE_SIZE];
     int3 *queries = new int3[N_QUERIES];
@@ -34,7 +36,6 @@ int main()
     buildKDTree(points, tree, N_POINTS, TREE_SIZE);
     generatePoints(queries, N_QUERIES);
 
-    auto start = std::chrono::system_clock::now();
 
     int3 *results = new int3[N_QUERIES];
     for (int i = 0; i < N_QUERIES; i++)
