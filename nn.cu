@@ -12,7 +12,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
    }
 }
 
-const int N_POINTS = 1e3, N_QUERIES = 1e3, INF = 1e9;
+const int N_POINTS = 1e6, N_QUERIES = 1e6, INF = 1e9;
 
 void runAndTime(void (*f)(int3*, int, int3*, int), int3 *tree, int treeSize, int3 *queries, int nQueries);
 void print(int3 *points, int n);
