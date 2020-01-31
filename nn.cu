@@ -144,23 +144,24 @@ __device__ int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int 
 __global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
     int3 node = tree[1];
+    int3 query = queries[index];
 
     if(index < nQueries) {
-        if ((node.x < query.x) && (treeNode * 2 < treeSize))
+        if ((node.x < query.x) && (2 < treeSize))
         {
             int3 leftChild = tree[treeSize * 2];
             if (leftChild.x != -INF && leftChild.y != -INF && leftChild.z != -INF)
             {
-                results[index] = getCloser(query, node, findNearestNeighbor(tree, treeSize, treeNode * 2, depth + 1, query));
+                results[index] = getCloser(query, node, findNearestNeighbor(tree, treeSize, treeNode * 2, 1, query));
                 return;
             }
         }
-        else if ((node.x > query.x) && (treeNode * 2 + 1 < treeSize))
+        else if ((node.x > query.x) && (2 + 1 < treeSize))
         {
             int3 rightChild = tree[treeSize * 2];
             if (rightChild.x != -INF && rightChild.y != -INF && rightChild.z != -INF)
             {
-                results[index] = getCloser(query, node, findNearestNeighbor(tree, treeSize, treeNode * 2 + 1, depth + 1, query));
+                results[index] = getCloser(query, node, findNearestNeighbor(tree, treeSize, treeNode * 2 + 1, 1, query));
                 return;
             }
         }
