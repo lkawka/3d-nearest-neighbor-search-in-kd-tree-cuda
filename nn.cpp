@@ -21,7 +21,7 @@ void printResults(int3 *queries, int3 *results, int n);
 
 int main()
 {
-    srand(16);
+    srand(17);
 
     int TREE_SIZE = 1;
     while (TREE_SIZE < N_POINTS)
