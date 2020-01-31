@@ -58,7 +58,6 @@ int main() {
         }
     }
 
-    std::cout<<"count: "<<*c<<"\n";
     std::cout << "Elapsed time in milliseconds : " << duration << "ms\n\n";
 
     eChk(cudaFree(results));
