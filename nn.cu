@@ -17,7 +17,7 @@ const int N_POINTS = 1e4, N_QUERIES = 1e5, INF = 1e9, RANGE_MAX = 100, N_PRINT =
 __host__ void print(int3 *points, int n);
 __host__ void generatePoints(int3 *points, int n);
 __host__ void buildKDTree(int3 *points, int3 *tree, int n, int m);
-__global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries, int *c);
+__global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries);
 __host__ void printResults(int3 *queries, int3 *results, int start, int end);
 
 int main() {
@@ -29,8 +29,6 @@ int main() {
     int3 *points;
     int3 *tree;
     int3 *queries;
-    int *c;
-    eChk(cudaMallocManaged(&c, sizeof(int)));
 
     eChk(cudaMallocManaged(&points, N_POINTS * sizeof(int3)));
     eChk(cudaMallocManaged(&tree, TREE_SIZE * sizeof(int3)));
@@ -45,13 +43,20 @@ int main() {
     int3 *results;
     eChk(cudaMallocManaged(&results, N_QUERIES * sizeof(int3)));
 
-    nearestNeighborGPU<<<1024, 32>>>(tree, TREE_SIZE, queries, results, N_QUERIES, c);
+    nearestNeighborGPU<<<1024, 32>>>(tree, TREE_SIZE, queries, results, N_QUERIES);
     eChk(cudaDeviceSynchronize());
     
     auto end = std::chrono::system_clock::now();
     float duration = 1000.0 * std::chrono::duration<float>(end - start).count();
 
     printResults(queries, results, N_QUERIES-N_PRINT-1, N_QUERIES);
+
+    for(int i = 0; i < N_QUERIES; i ++) {
+        if(queries[i].x == 0 && queries[i].y == 0 && queries[i].z == 0) {
+            std::cout<<"i: "<<i<<"\n";
+            break;
+        }
+    }
 
     std::cout<<"count: "<<*c<<"\n";
     std::cout << "Elapsed time in milliseconds : " << duration << "ms\n\n";
@@ -148,10 +153,8 @@ __device__ int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int 
     return node;
 }
 
-__global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries, int *c) {
+__global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
-
-    atomicMax(c, index);
 
     if(index < nQueries) {
         results[index] = findNearestNeighbor(tree, treeSize, 1, 0, queries[index]);
