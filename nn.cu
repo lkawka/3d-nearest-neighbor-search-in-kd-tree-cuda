@@ -43,8 +43,8 @@ int main() {
     eChk(cudaMallocManaged(&results, N_QUERIES * sizeof(int3)));
 
     nearestNeighborGPU<<<512, 16>>>(tree, TREE_SIZE, queries, results, N_QUERIES);
-    eChk(cudaDeviceSynchronize());
     eChk(cudaPeekAtLastError());
+    eChk(cudaDeviceSynchronize());
     
     auto end = std::chrono::system_clock::now();
     float duration = 1000.0 * std::chrono::duration<float>(end - start).count();
