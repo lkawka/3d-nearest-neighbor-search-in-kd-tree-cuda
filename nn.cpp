@@ -141,7 +141,7 @@ int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int depth, int3
     }
     else if ((val1 > val2) && (treeNode * 2 + 1 < treeSize))
     {
-        int3 rightChild = tree[treeNode * 2];
+        int3 rightChild = tree[treeNode * 2 + 1];
         if (rightChild.x != -INF && rightChild.y != -INF && rightChild.z != -INF)
         {
             return closer(query, node, findNearestNeighbor(tree, treeSize, treeNode * 2 + 1, depth + 1, query));
