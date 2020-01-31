@@ -18,6 +18,7 @@ void print(int3 *points, int n);
 __host__ void generatePoints(int3 *points, int n);
 __host__ void buildKDTree(int3 *points, int3 *tree, int n, int m);
 __global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries);
+__host__ void printResults(int3 *queries, int3 *results, int n);
 
 int main() {
     srand(16);
@@ -48,7 +49,10 @@ int main() {
     auto end = std::chrono::system_clock::now();
     float duration = 1000.0 * std::chrono::duration<float>(end - start).count();
 
+
+
     std::cout << "Elapsed time in milliseconds : " << duration << "ms\n\n";
+
     eChk(cudaFree(results));
     eChk(cudaFree(points));
     eChk(cudaFree(tree));
@@ -147,4 +151,8 @@ __global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3
     if(index < nQueries) {
         results[index] = findNearestNeighbor(tree, treeSize, 1, 0, queries[index]);
     }
+}
+
+__host__ void printResults(int3 *queries, int3 *results, int n) {
+    
 }
