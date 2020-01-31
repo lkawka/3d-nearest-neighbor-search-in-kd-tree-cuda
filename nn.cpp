@@ -64,7 +64,7 @@ void generatePoints(int3 *points, int n)
 {
     for (int i = 0; i < n; i++)
     {
-        points[i] = {.x = rand() % RANGE_MAX, .y = rand() % RANGE_MAX, .z = rand() % RANGE_MAX};
+        points[i] = {.x = rand() % RANGE_MAX+1, .y = rand() % RANGE_MAX+1, .z = rand() % RANGE_MAX+1};
     }
 }
 

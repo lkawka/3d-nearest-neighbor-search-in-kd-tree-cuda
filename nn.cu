@@ -64,7 +64,7 @@ int main() {
 
 __host__ void generatePoints(int3 *points, int n) {
     for(int i = 0; i < n; i++) {
-        points[i] = make_int3(rand()%RANGE_MAX, rand()%RANGE_MAX, rand()%RANGE_MAX);
+        points[i] = make_int3(rand()%RANGE_MAX+1, rand()%RANGE_MAX+1, rand()%RANGE_MAX+1);
     }
 }
 
