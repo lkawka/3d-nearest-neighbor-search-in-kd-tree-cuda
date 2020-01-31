@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <math.h>
 
-const int N_POINTS = 1e3, N_QUERIES = 1e6, INF = 1e9;
+const int N_POINTS = 1e3, N_QUERIES = 1e6, INF = 1e9, RANGE_MAX = 100;
 
 struct int3
 {
@@ -66,7 +66,7 @@ void generatePoints(int3 *points, int n)
 {
     for (int i = 0; i < n; i++)
     {
-        points[i] = {.x = rand() % 100, .y = rand() % 100, .z = rand() % 100};
+        points[i] = {.x = rand() % RANGE_MAX, .y = rand() % RANGE_MAX, .z = rand() % RANGE_MAX};
     }
 }
 

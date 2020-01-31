@@ -12,7 +12,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
    }
 }
 
-const int N_POINTS = 1e3, N_QUERIES = 1e6, INF = 1e9;
+const int N_POINTS = 1e3, N_QUERIES = 1e6, INF = 1e9, RANGE_MAX = 100;
 
 void print(int3 *points, int n);
 __host__ void generatePoints(int3 *points, int n);
@@ -57,7 +57,7 @@ int main() {
 
 __host__ void generatePoints(int3 *points, int n) {
     for(int i = 0; i < n; i++) {
-        points[i] = make_int3(rand()%100, rand()%100, rand()%100);
+        points[i] = make_int3(rand()%RANGE_MAX, rand()%RANGE_MAX, rand()%RANGE_MAX);
     }
 }
 
@@ -142,42 +142,6 @@ __device__ int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int 
 }
 
 __global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries) {
-    // int index = blockIdx.x * blockDim.x + threadIdx.x;
-    // __shared__ int3 node[3];
-    // if(threadIdx.x == 0) {
-    //     node[0] = tree[1];
-    //     if(2 < treeSize) {
-    //         node[1] = tree[2];
-    //     }
-    //     if(3 < treeSize) {
-    //         node[2] = tree[3];
-    //     }
-    // }
-
-    // int3 query = queries[index];
-
-    // __syncthreads();
-
-    // if(index < nQueries) {
-    //     if ((node[0].x < query.x) && (2 < treeSize))
-    //     {
-    //         if (node[1].x != -INF && node[1].y != -INF && node[1].z != -INF)
-    //         {
-    //             results[index] = getCloser(query, node[0], findNearestNeighbor(tree, treeSize, 2, 1, query));
-    //             return;
-    //         }
-    //     }
-    //     else if ((node[0].x > query.x) && (2 + 1 < treeSize))
-    //     {
-    //         if (node[2].x != -INF && node[2].y != -INF && node[2].z != -INF)
-    //         {
-    //             results[index] = getCloser(query, node[0], findNearestNeighbor(tree, treeSize, 2 + 1, 1, query));
-    //             return;
-    //         }
-    //     }
-    //     results[index] = findNearestNeighbor(tree, treeSize, 1, 0, query);
-    // }
-
     int index = blockIdx.x * blockDim.x + threadIdx.x;
 
     if(index < nQueries) {
