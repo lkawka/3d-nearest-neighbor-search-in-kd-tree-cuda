@@ -29,6 +29,8 @@ int main() {
     int3 *points;
     int3 *tree;
     int3 *queries;
+    int *c;
+    eChk(cudaMallocManaged(&c, sizeof(int)));
 
     eChk(cudaMallocManaged(&points, N_POINTS * sizeof(int3)));
     eChk(cudaMallocManaged(&tree, TREE_SIZE * sizeof(int3)));
@@ -43,7 +45,7 @@ int main() {
     int3 *results;
     eChk(cudaMallocManaged(&results, N_QUERIES * sizeof(int3)));
 
-    nearestNeighborGPU<<<1024, 32>>>(tree, TREE_SIZE, queries, results, N_QUERIES);
+    nearestNeighborGPU<<<1024, 32>>>(tree, TREE_SIZE, queries, results, N_QUERIES, c);
     eChk(cudaDeviceSynchronize());
     
     auto end = std::chrono::system_clock::now();
@@ -51,7 +53,7 @@ int main() {
 
     printResults(queries, results, N_QUERIES-N_PRINT-1, N_QUERIES);
 
-    std::cout<<results[N_QUERIES-1].x<<"\n";
+    std::cout<<"count: "<<*c<<"\n";
     std::cout << "Elapsed time in milliseconds : " << duration << "ms\n\n";
 
     eChk(cudaFree(results));
@@ -146,8 +148,10 @@ __device__ int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int 
     return node;
 }
 
-__global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries) {
+__global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries, int *c) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
+
+    c = atomicAdd(c, 1);
 
     if(index < nQueries) {
         results[index] = findNearestNeighbor(tree, treeSize, 1, 0, queries[index]);
