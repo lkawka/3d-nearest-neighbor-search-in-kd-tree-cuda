@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <math.h>
 
-const int N_POINTS = 1e3, N_QUERIES = 1e6, INF = 1e9, RANGE_MAX = 100, N_PRINT = 10;
+const int N_POINTS = 1e4, N_QUERIES = 1e6, INF = 1e9, RANGE_MAX = 100, N_PRINT = 10;
 
 struct int3
 {
