@@ -14,7 +14,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 const int N_POINTS = 1e3, N_QUERIES = 1e6, INF = 1e9, RANGE_MAX = 100, N_PRINT = 10;
 
-void print(int3 *points, int n);
+__host__ void print(int3 *points, int n);
 __host__ void generatePoints(int3 *points, int n);
 __host__ void buildKDTree(int3 *points, int3 *tree, int n, int m);
 __global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries);
@@ -98,7 +98,7 @@ void print(int3 *points, int n) {
 
 __device__ int3 getCloser(int3 p, int3 p2, int3 p3)
 {
-    if ((pow(p.x - p2.x, 2) + pow(p.y - p2.y, 2) + pow(p.z - p2.z, 2)) < (pow(p.x - p3.x, 2) + pow(p.y - p3.y, 2) + pow(p.z - p3.z, 2)))
+    if ((abs(p.x - p2.x) + abs(p.y - p2.y) + abs(p.z - p2.z)) < (abs(p.x - p3.x) + abs(p.y - p3.y) + abs(p.z - p3.z)))
     {
         return p2;
     }
