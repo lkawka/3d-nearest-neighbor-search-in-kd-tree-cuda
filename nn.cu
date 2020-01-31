@@ -143,47 +143,27 @@ __device__ int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int 
 
 __global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
-    __shared__ int3 node = tree[1];
+    int3 node = tree[1];
 
     if(index < nQueries) {
-        int val1, val2;
-        if (depth % 3 == 0)
+        if ((node.x < query.x) && (treeNode * 2 < treeSize))
         {
-            val1 = node.x;
-            val2 = query.x;
+            int3 leftChild = tree[treeSize * 2];
+            if (leftChild.x != -INF && leftChild.y != -INF && leftChild.z != -INF)
+            {
+                results[index] = getCloser(query, node, findNearestNeighbor(tree, treeSize, treeNode * 2, depth + 1, query));
+                return;
+            }
         }
-        else if (depth % 3 == 1)
+        else if ((node.x > query.x) && (treeNode * 2 + 1 < treeSize))
         {
-            val1 = node.y;
-            val2 = query.y;
+            int3 rightChild = tree[treeSize * 2];
+            if (rightChild.x != -INF && rightChild.y != -INF && rightChild.z != -INF)
+            {
+                results[index] = getCloser(query, node, findNearestNeighbor(tree, treeSize, treeNode * 2 + 1, depth + 1, query));
+                return;
+            }
         }
-        else
-        {
-            val1 = node.z;
-            val2 = query.z;
-        }
-    }
-
-    if ((val1 < val2) && (treeNode * 2 < treeSize))
-    {
-        int3 leftChild = tree[treeSize * 2];
-        if (leftChild.x != -INF && leftChild.y != -INF && leftChild.z != -INF)
-        {
-            results[index] = getCloser(query, node, findNearestNeighbor(tree, treeSize, treeNode * 2, depth + 1, query));
-            return;
-        }
-    }
-    else if ((val1 > val2) && (treeNode * 2 + 1 < treeSize))
-    {
-        int3 rightChild = tree[treeSize * 2];
-        if (rightChild.x != -INF && rightChild.y != -INF && rightChild.z != -INF)
-        {
-            results[index] = getCloser(query, node, findNearestNeighbor(tree, treeSize, treeNode * 2 + 1, depth + 1, query));
-            return;
-        }
-    }
-
-    if(index < nQueries) {
         results[index] = findNearestNeighbor(tree, treeSize, 1, 0, queries[index]);
     }
 }
