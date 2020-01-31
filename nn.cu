@@ -14,7 +14,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 const int N_POINTS = 1e4, N_QUERIES = 1e6, INF = 1e9, RANGE_MAX = 100, N_PRINT = 10;
 
-__host__ void print(int3 *points, int n);
+__host__ void print(int3 *points, int start, int end);
 __host__ void generatePoints(int3 *points, int n);
 __host__ void buildKDTree(int3 *points, int3 *tree, int n, int m);
 __global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries);
@@ -49,7 +49,7 @@ int main() {
     auto end = std::chrono::system_clock::now();
     float duration = 1000.0 * std::chrono::duration<float>(end - start).count();
 
-    printResults(queries, results, N_PRINT);
+    printResults(queries, results, N_QUERIES-N_PRINT-1, N_QUERIES);
 
     std::cout<<results[N_QUERIES-1].x<<"\n";
     std::cout << "Elapsed time in milliseconds : " << duration << "ms\n\n";
@@ -154,8 +154,8 @@ __global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3
     }
 }
 
-__host__ void printResults(int3 *queries, int3 *results, int n) {
-    for(int i = 0; i < n; i++) {
+__host__ void printResults(int3 *queries, int3 *results, int start, int end) {
+    for(int i = start; i < end; i++) {
         std::cout<<"query: ["<<queries[i].x<<", "<<queries[i].y<<", "<<queries[i].z<<"] ";
         std::cout<<", result: ["<<results[i].x<<", "<<results[i].y<<", "<<results[i].z<<"] ";
         std::cout<<", distance: "<<sqrt(pow(queries[i].x - results[i].x, 2) + pow(queries[i].y - results[i].y, 2) + pow(queries[i].z - results[i].z, 2));
