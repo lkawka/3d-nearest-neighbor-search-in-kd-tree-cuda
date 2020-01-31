@@ -12,7 +12,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
    }
 }
 
-const int N_POINTS = 1e4, N_QUERIES = 1e6, INF = 1e9, RANGE_MAX = 100, N_PRINT = 10;
+const int N_POINTS = 1e5, N_QUERIES = 1e6, INF = 1e9, RANGE_MAX = 100, N_PRINT = 10;
 
 __host__ void print(int3 *points, int n);
 __host__ void generatePoints(int3 *points, int n);
@@ -51,6 +51,7 @@ int main() {
 
     printResults(queries, results, N_PRINT);
 
+    std::cout<<results[N_QUERIES-1].x<<"\n";
     std::cout << "Elapsed time in milliseconds : " << duration << "ms\n\n";
 
     eChk(cudaFree(results));
