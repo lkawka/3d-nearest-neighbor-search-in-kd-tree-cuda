@@ -51,13 +51,6 @@ int main() {
 
     printResults(queries, results, N_QUERIES-N_PRINT-1, N_QUERIES);
 
-    for(int i = 0; i < N_QUERIES; i ++) {
-        if(results[i].x == 0 && results[i].y == 0 && results[i].z == 0) {
-            std::cout<<"i: "<<i<<"\n";
-            break;
-        }
-    }
-
     std::cout << "Elapsed time in milliseconds : " << duration << "ms\n\n";
 
     eChk(cudaFree(results));
