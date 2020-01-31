@@ -44,6 +44,7 @@ int main() {
 
     nearestNeighborGPU<<<512, 16>>>(tree, TREE_SIZE, queries, results, N_QUERIES);
     eChk(cudaDeviceSynchronize());
+    eChk(cudaPeekAtLastError());
     
     auto end = std::chrono::system_clock::now();
     float duration = 1000.0 * std::chrono::duration<float>(end - start).count();
@@ -70,11 +71,11 @@ __host__ void buildSubTree(int3 *points, int3 *tree, int start, int end, int dep
         return p1.z < p2.z;
     });
 
-    int split = (start + end-1)/2;
+    int split = (start + end - 1)/2;
     tree[node] = points[split];
 
     buildSubTree(points, tree, start, split, depth+1, node*2);
-    buildSubTree(points, tree, split+1, end, depth+1, node*2 + 1);
+    buildSubTree(points, tree, split + 1, end, depth+1, node*2 + 1);
 }
 
 __host__ void buildKDTree(int3 *points, int3 *tree, int n, int treeSize) {
