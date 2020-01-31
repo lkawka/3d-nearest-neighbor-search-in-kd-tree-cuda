@@ -17,7 +17,7 @@ const int N_POINTS = 1e4, N_QUERIES = 1e6, INF = 1e9, RANGE_MAX = 100, N_PRINT =
 __host__ void print(int3 *points, int n);
 __host__ void generatePoints(int3 *points, int n);
 __host__ void buildKDTree(int3 *points, int3 *tree, int n, int m);
-__global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries);
+__global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries, int *c);
 __host__ void printResults(int3 *queries, int3 *results, int start, int end);
 
 int main() {
