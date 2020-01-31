@@ -12,7 +12,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
    }
 }
 
-const int N_POINTS = 5, N_QUERIES = 5, INF = 1e9, RANGE_MAX = 10, N_PRINT = 5;
+const int N_POINTS = 1e4, N_QUERIES = 1e6, INF = 1e9, RANGE_MAX = 100, N_PRINT = 10;
 
 void print(int3 *points, int n);
 __host__ void generatePoints(int3 *points, int n);
@@ -49,8 +49,6 @@ int main() {
     auto end = std::chrono::system_clock::now();
     float duration = 1000.0 * std::chrono::duration<float>(end - start).count();
 
-    print(points, N_POINTS);
-    print(queries, N_QUERIES);
     printResults(queries, results, N_PRINT);
 
     std::cout << "Elapsed time in milliseconds : " << duration << "ms\n\n";
