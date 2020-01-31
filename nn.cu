@@ -14,11 +14,11 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 const int N_POINTS = 1e4, N_QUERIES = 1e6, INF = 1e9, RANGE_MAX = 100, N_PRINT = 10;
 
-__host__ void print(int3 *points, int start, int end);
+__host__ void print(int3 *points, int n);
 __host__ void generatePoints(int3 *points, int n);
 __host__ void buildKDTree(int3 *points, int3 *tree, int n, int m);
 __global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries);
-__host__ void printResults(int3 *queries, int3 *results, int n);
+__host__ void printResults(int3 *queries, int3 *results, int start, int end);
 
 int main() {
     srand(16);
