@@ -161,13 +161,13 @@ __global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3
         }
         else if ((node.x > query.x) && (2 + 1 < treeSize))
         {
-            int3 rightChild = tree[treeSize * 2];
+            int3 rightChild = tree[treeSize * 2 + 1];
             if (rightChild.x != -INF && rightChild.y != -INF && rightChild.z != -INF)
             {
                 results[index] = getCloser(query, node, findNearestNeighbor(tree, treeSize, 2 + 1, 1, query));
                 return;
             }
         }
-        results[index] = findNearestNeighbor(tree, treeSize, 1, 0, queries[index]);
+        results[index] = findNearestNeighbor(tree, treeSize, 1, 0, query);
     }
 }
