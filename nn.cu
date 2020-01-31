@@ -43,7 +43,7 @@ int main() {
     int3 *results;
     eChk(cudaMallocManaged(&results, N_QUERIES * sizeof(int3)));
 
-    nearestNeighborGPU<<<512, 4>>>(tree, TREE_SIZE, queries, results, N_QUERIES);
+    nearestNeighborGPU<<<256, 4>>>(tree, TREE_SIZE, queries, results, N_QUERIES);
     eChk(cudaDeviceSynchronize());
     
     auto end = std::chrono::system_clock::now();
