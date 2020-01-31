@@ -143,8 +143,11 @@ __device__ int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int 
 
 __global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
-    int3 node = tree[1];
+    __shared__ int3 node;
+    node = tree[1];
     int3 query = queries[index];
+
+    __syncthreads();
 
     if(index < nQueries) {
         if ((node.x < query.x) && (2 < treeSize))
