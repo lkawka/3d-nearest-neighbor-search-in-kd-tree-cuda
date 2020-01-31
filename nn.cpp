@@ -17,6 +17,7 @@ void print(int3 *points, int n);
 void generatePoints(int3 *points, int n);
 void buildKDTree(int3 *points, int3 *tree, int n, int m);
 int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int depth, int3 query);
+void printResults(int3 *queries, int3 *results, int n);
 
 int main()
 {
@@ -46,10 +47,7 @@ int main()
     auto end = std::chrono::system_clock::now();
     float duration = 1000.0 * std::chrono::duration<float>(end - start).count();
 
-    // std::cout<<"Queries: \n";
-    // print(queries, N_QUERIES);
-    // std::cout<<"Nearest neighbors: \n";
-    // print(results, N_QUERIES);
+    printResults(queries, results, 5);
     std::cout << "Elapsed time in milliseconds : " << duration << "ms\n\n";
 }
 
@@ -150,4 +148,13 @@ int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int depth, int3
         }
     }
     return node;
+}
+
+void printResults(int3 *queries, int3 *results, int n) {
+    for(int i = 0; i < n; i++) {
+        std::cout<<"query: ["<<queries[i].x<<", "<<queries[i].y<<", "<<queries[i].z<<"] ";
+        std::cout<<", result: ["<<results[i].x<<", "<<results[i].y<<", "<<results[i].z<<"] ";
+        std::cout<<", distance: "<<sqrt(pow(queries[i].x - results[i].x, 2) + pow(queries[i].y - results[i].y, 2) + pow(queries[i].z - results[i].z, 2));
+        std::cout<<std::endl;
+    }
 }
