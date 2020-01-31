@@ -43,7 +43,6 @@ int main() {
     eChk(cudaMallocManaged(&results, N_QUERIES * sizeof(int3)));
 
     nearestNeighborGPU<<<512, 16>>>(tree, TREE_SIZE, queries, results, N_QUERIES);
-    eChk(cudaPeekAtLastError());
     eChk(cudaDeviceSynchronize());
     
     auto end = std::chrono::system_clock::now();
@@ -144,31 +143,8 @@ __device__ int3 findNearestNeighbor(int3 *tree, int treeSize, int treeNode, int 
 
 __global__ void nearestNeighborGPU(int3 *tree, int treeSize, int3 *queries, int3 *results, int nQueries) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
-    __shared__ int3 node;
-    node = tree[1];
-    int3 query = queries[index];
-
-    __syncthreads();
 
     if(index < nQueries) {
-        if ((node.x < query.x) && (2 < treeSize))
-        {
-            int3 leftChild = tree[treeSize * 2];
-            if (leftChild.x != -INF && leftChild.y != -INF && leftChild.z != -INF)
-            {
-                results[index] = getCloser(query, node, findNearestNeighbor(tree, treeSize, 2, 1, query));
-                return;
-            }
-        }
-        else if ((node.x > query.x) && (2 + 1 < treeSize))
-        {
-            int3 rightChild = tree[treeSize * 2 + 1];
-            if (rightChild.x != -INF && rightChild.y != -INF && rightChild.z != -INF)
-            {
-                results[index] = getCloser(query, node, findNearestNeighbor(tree, treeSize, 2 + 1, 1, query));
-                return;
-            }
-        }
-        results[index] = findNearestNeighbor(tree, treeSize, 1, 0, query);
+        results[index] = findNearestNeighbor(tree, treeSize, 1, 0, queries[index]);
     }
 }
